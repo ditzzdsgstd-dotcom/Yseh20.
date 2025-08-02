@@ -482,74 +482,70 @@ local GunTab = Window:MakeTab({
 	PremiumOnly = false
 })
 
--- // Infinite Ammo
-local function InfiniteAmmo()
-	for _, tool in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-		if tool:FindFirstChild("Ammo") then
-			tool.Ammo.Value = math.huge
+-- // Function: Edit Gun Module Values
+local function PatchGun(tool)
+	local gunMod = tool:FindFirstChild("GunSettings") or tool:FindFirstChild("Settings")
+	if gunMod and gunMod:IsA("ModuleScript") then
+		local data = require(gunMod)
+		pcall(function()
+			data.Ammo = math.huge
+			data.StoredAmmo = math.huge
+			data.TotalAmmo = math.huge
+			data.ReloadTime = 0
+			data.FireRate = 0.001
+			data.Spread = 0
+			data.Bloom = 0
+			data.Recoil = 0
+			data.KickUp = 0
+			data.Auto = true
+		end)
+	end
+end
+
+-- // Apply patch to tools
+local function PatchAllGuns()
+	local plr = game.Players.LocalPlayer
+	for _, tool in pairs(plr.Backpack:GetChildren()) do
+		if tool:IsA("Tool") then
+			PatchGun(tool)
 		end
 	end
-	for _, tool in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
-		if tool:IsA("Tool") and tool:FindFirstChild("Ammo") then
-			tool.Ammo.Value = math.huge
+	for _, tool in pairs(plr.Character:GetChildren()) do
+		if tool:IsA("Tool") then
+			PatchGun(tool)
 		end
 	end
 end
 
+-- // Infinite Ammo Button
 GunTab:AddButton({
 	Name = "Infinite Ammo",
-	Callback = InfiniteAmmo
+	Callback = PatchAllGuns
 })
 
--- // Instant Reload
-local function InstantReload()
-	for _, tool in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-		if tool:FindFirstChild("ReloadTime") then
-			tool.ReloadTime.Value = 0
-		end
-	end
-	for _, tool in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
-		if tool:IsA("Tool") and tool:FindFirstChild("ReloadTime") then
-			tool.ReloadTime.Value = 0
-		end
-	end
-end
-
+-- // Instant Reload Button
 GunTab:AddButton({
 	Name = "Instant Reload",
-	Callback = InstantReload
+	Callback = PatchAllGuns
 })
 
--- // Fire Rate Modifier
-getgenv().GunRate = 1
-
-local function ModifyFireRate(mult)
-	for _, tool in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
-		if tool:FindFirstChild("FireRate") then
-			tool.FireRate.Value = tool.FireRate.Value / mult
-		elseif tool:FindFirstChild("Cooldown") then
-			tool.Cooldown.Value = tool.Cooldown.Value / mult
-		end
-	end
-	for _, tool in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
-		if tool:IsA("Tool") then
-			if tool:FindFirstChild("FireRate") then
-				tool.FireRate.Value = tool.FireRate.Value / mult
-			elseif tool:FindFirstChild("Cooldown") then
-				tool.Cooldown.Value = tool.Cooldown.Value / mult
+-- // Fire Rate Slider (Optional)
+GunTab:AddSlider({
+	Name = "Set FireRate (Lower = Faster)",
+	Min = 0.001,
+	Max = 1,
+	Default = 0.01,
+	Increment = 0.001,
+	Callback = function(rate)
+		local plr = game.Players.LocalPlayer
+		for _, tool in pairs(plr.Backpack:GetChildren()) do
+			local gunMod = tool:FindFirstChild("GunSettings")
+			if gunMod and gunMod:IsA("ModuleScript") then
+				local data = require(gunMod)
+				pcall(function()
+					data.FireRate = rate
+				end)
 			end
 		end
-	end
-end
-
-GunTab:AddSlider({
-	Name = "FireRate Multiplier",
-	Min = 1,
-	Max = 10,
-	Default = 1,
-	Increment = 1,
-	Callback = function(val)
-		getgenv().GunRate = val
-		ModifyFireRate(val)
 	end
 })
