@@ -474,3 +474,82 @@ game:GetService("RunService").RenderStepped:Connect(function()
 		end
 	end
 end)
+
+-- // GunMods Tab
+local GunTab = Window:MakeTab({
+	Name = "GunMods",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+-- // Infinite Ammo
+local function InfiniteAmmo()
+	for _, tool in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+		if tool:FindFirstChild("Ammo") then
+			tool.Ammo.Value = math.huge
+		end
+	end
+	for _, tool in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+		if tool:IsA("Tool") and tool:FindFirstChild("Ammo") then
+			tool.Ammo.Value = math.huge
+		end
+	end
+end
+
+GunTab:AddButton({
+	Name = "Infinite Ammo",
+	Callback = InfiniteAmmo
+})
+
+-- // Instant Reload
+local function InstantReload()
+	for _, tool in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+		if tool:FindFirstChild("ReloadTime") then
+			tool.ReloadTime.Value = 0
+		end
+	end
+	for _, tool in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+		if tool:IsA("Tool") and tool:FindFirstChild("ReloadTime") then
+			tool.ReloadTime.Value = 0
+		end
+	end
+end
+
+GunTab:AddButton({
+	Name = "Instant Reload",
+	Callback = InstantReload
+})
+
+-- // Fire Rate Modifier
+getgenv().GunRate = 1
+
+local function ModifyFireRate(mult)
+	for _, tool in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+		if tool:FindFirstChild("FireRate") then
+			tool.FireRate.Value = tool.FireRate.Value / mult
+		elseif tool:FindFirstChild("Cooldown") then
+			tool.Cooldown.Value = tool.Cooldown.Value / mult
+		end
+	end
+	for _, tool in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+		if tool:IsA("Tool") then
+			if tool:FindFirstChild("FireRate") then
+				tool.FireRate.Value = tool.FireRate.Value / mult
+			elseif tool:FindFirstChild("Cooldown") then
+				tool.Cooldown.Value = tool.Cooldown.Value / mult
+			end
+		end
+	end
+end
+
+GunTab:AddSlider({
+	Name = "FireRate Multiplier",
+	Min = 1,
+	Max = 10,
+	Default = 1,
+	Increment = 1,
+	Callback = function(val)
+		getgenv().GunRate = val
+		ModifyFireRate(val)
+	end
+})
