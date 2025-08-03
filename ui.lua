@@ -82,17 +82,16 @@ setreadonly(mt, false)
 mt.__namecall = newcclosure(function(self, ...)
 	local args = {...}
 	local method = getnamecallmethod()
-	if method == "FindPartOnRayWithIgnoreList" and getgenv().SilentAim then
-		local target = GetClosestTarget()
-		if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-			local origin = Camera.CFrame.Position
-			local direction = (target.Character.HumanoidRootPart.Position - origin).Unit * 1000
-			local ray = Ray.new(origin, direction)
-			return oldNamecall(self, ray, unpack(args, 2))
-		end
+if method == "FindPartOnRayWithIgnoreList" and getgenv().SilentAim then
+	local target = GetClosestTarget()
+	if target and target.Character and target.Character:FindFirstChild("Head") then
+		local origin = Camera.CFrame.Position
+		local direction = (target.Character.Head.Position - origin).Unit * 1000
+		local ray = Ray.new(origin, direction)
+		return oldNamecall(self, ray, unpack(args, 2))
 	end
-	return oldNamecall(self, ...)
-end)
+		end
+		
 
 -- // FOV & Target Line Rendering
 RunService.RenderStepped:Connect(function()
