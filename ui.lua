@@ -1,5 +1,5 @@
 -- // Load OrionLib Nightmare
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/x2zu/OPEN-SOURCE-UI-ROBLOX/main/X2ZU%20UI%20ROBLOX%20OPEN%20SOURCE/Codex_Ui_Src%20(1).txt"))()
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/1nig1htmare1234/SCRIPTS/main/Orion.lua"))()
 
 local Window = OrionLib:MakeWindow({
 	Name = "YoxanXHub - Hypershot Gunfight",
